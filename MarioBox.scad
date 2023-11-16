@@ -46,8 +46,17 @@ module Cutout_BoltHead(size, depth) {
 }
 
 module AllModels() {
-    rotate([0,0,90]) import("box.stl", convexity=10);
+    union(){
+        rotate([0,0,90]) import("Box.stl", convexity=10);
+        Reinforcement();
+    }
     translate([clipLocX,clipLocY,clipLocZ]) clip(cubeDimsX,cubeDimsY,cubeDimsZ);
+    
+}
+
+module Reinforcement(){
+    translate([-3,-86,37]) 
+    cube([3,69,50]);
 }
 
 

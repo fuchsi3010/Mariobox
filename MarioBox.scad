@@ -2,7 +2,7 @@ $fn=100;
 //clip settings
 clipThickness = 5;
 clipWidth = 50; //how broad the clip is
-clipClearance = 60; // gap of the clip - measure what you want to clip onto;
+clipClearance = 12; // gap of the clip - measure what you want to clip onto;
 
 // Holes settings
 // box
@@ -12,6 +12,14 @@ holesClipDiameter = 4.1;
 
 // for modelling/debugging
 clipToBoxSpacing = 10; //set to '0' for alignement
+
+
+
+//////////////////////////////////////////////////
+/////////////// beginning of code ////////////////
+//////////////////////////////////////////////////
+
+actualClipClearance = clipClearance+2*clipThickness;
 
 Main();
 
@@ -23,7 +31,8 @@ module Main() {
         }
         translate([-3, -35, 50]) holes(3, holesBoxDiameter); //cube's wall = 3 mm
     }
-    translate([clipToBoxSpacing,-75,40]) clip();
+    // translate([clipToBoxSpacing,-75,40]) clip(); // for alignement
+    rotate([0,180,0]) translate([-3*clipToBoxSpacing,-50,-55]) clip(); //for printing
     
 }
 
@@ -31,8 +40,8 @@ module clip() {
     difference(){
         union(){
             cube([clipThickness,clipWidth,50]); //plate connecting to cube
-            translate([0,0,50]) cube([clipClearance,clipWidth,clipThickness]); //top plate
-            translate([clipClearance-clipThickness,0,0]) cube([clipThickness,clipWidth,50]); //plate furthest from cube
+            translate([0,0,50]) cube([actualClipClearance,clipWidth,clipThickness]); //top plate
+            translate([actualClipClearance-clipThickness,0,0]) cube([clipThickness,clipWidth,50]); //plate furthest from cube
             
             // chamfer (closer to box)
             difference(){ 
@@ -42,12 +51,9 @@ module clip() {
             }
             // chamfer (away from box)
             difference(){ 
-                translate([clipClearance-2*clipThickness,0,50-clipThickness]) cube([clipThickness,clipWidth,clipThickness]);
-                rotate([90,0,0]) translate([clipClearance-2*clipThickness,50-clipThickness,-clipWidth]) cylinder(h=clipWidth,r=clipThickness);
+                translate([actualClipClearance-2*clipThickness,0,50-clipThickness]) cube([clipThickness,clipWidth,clipThickness]);
+                rotate([90,0,0]) translate([actualClipClearance-2*clipThickness,50-clipThickness,-clipWidth]) cylinder(h=clipWidth,r=clipThickness);
             }
-
-            
-            
         }
         translate([0, 40, 10]) holes(clipThickness, holesClipDiameter);
     }

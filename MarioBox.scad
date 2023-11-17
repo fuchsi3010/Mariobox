@@ -8,7 +8,7 @@ inner_offset = 10;
 
 cubeSize = 100; // Referenced from STL. DO NOT CHANGE
 
-clipLocX = 5+size/2;
+clipLocX = 13+size/2; //contact: 15+size/2
 clipLocY = -50;
 clipLocZ = 75;
 
@@ -22,58 +22,55 @@ boltHeadSizeDiam = 6; // CHANGE bolt head shaft size (mm)
 boltHoleLength = 30;
 boltHeadLength = 10;
 
+//clip settings
+clipThickness = 5;
+clipWidth = 50; //how broad the clip is
+clipClearance = 40; // gap of the clip - measure what you want to clip onto;
+
+// Holes settings
+// box
+holesBoxDiameter = 3;
+// clip
+holesClipDiameter = 4.1;
+
+// for modelling/debugging
+clipToBoxSpacing = 10; //set to '0' for alignement
 
 Main();
 
 module Main() {
-    difference() {
-        AllModels();
-        AllCutouts();
-    }
-}
-
-module AllCutouts() {
-    Cutout_BoltShaft(boltHoleSizeDiam, boltHoleLength);
-    Cutout_BoltHead(boltHeadSizeDiam, boltHoleLength);
-}
-
-module Cutout_BoltShaft(size, depth) {
-        translate([boltHolesX,boltHolesX,boltHolesZ]) rotate([0,0,90]) translate([cubeSize/-2,boltHoleLength/2,cubeSize/2]) boltholes(size, depth);
-}
-
-module Cutout_BoltHead(size, depth) {
-        translate([boltHolesX,boltHolesX,boltHolesZ]) rotate([0,0,90]) translate([cubeSize/-2,boltHoleLength/2,cubeSize/2]) boltholes(size, depth);
-}
-
-module AllModels() {
     union(){
         rotate([0,0,90]) import("Box.stl", convexity=10);
-        Reinforcement();
+        translate([-3,-86,37]) cube([3,69,50]); //reinforcement
     }
-    translate([clipLocX,clipLocY,clipLocZ]) clip(cubeDimsX,cubeDimsY,cubeDimsZ);
+    translate([clipToBoxSpacing,-75,40]) clip();
+    
+    holesClip();
+    holesBox();
+}
+
+module clip() {
+    difference(){
+        union(){
+            cube([clipThickness,clipWidth,50]); //plate connecting to cube
+            translate([0,0,50]) cube([clipClearance,clipWidth,clipThickness]); //top plate
+            translate([clipClearance-clipThickness,0,0]) cube([clipThickness,clipWidth,50]); //plate furthest from cube
+        }
+        
+        translate([0, 40, 10]) holesClip();
+    }
+    
     
 }
 
-module Reinforcement(){
-    translate([-3,-86,37]) 
-    cube([3,69,50]);
-}
+module holesClip() {
+    translate([0,0,0]) rotate([0,90,0]) cylinder(h=clipThickness+1, r=holesClipDiameter);
+    translate([0,-30,0]) rotate([0,90,0]) cylinder(h=clipThickness+1, r=holesClipDiameter);
+    translate([0,0,30]) rotate([0,90,0]) cylinder(h=clipThickness+1, r=holesClipDiameter);
+    translate([0,-30,30]) rotate([0,90,0]) cylinder(h=clipThickness+1, r=holesClipDiameter);
+    }
 
 
-module clip(X,Y,Z) {
-    difference() {
-        cube([X,Y,Z-10], center = true);
-        translate([0,0,-5]) cube([X-inner_offset,Y+inner_offset, Z-inner_offset], center = true);  
-     }
-}
-
-module boltholes(size, depth) {
-    translate ([boltHolesSp,0,boltHolesSp]) bolthole(size, depth);
-    mirror([1,0,0]) translate ([boltHolesSp,0,boltHolesSp]) bolthole(size, depth);
-    mirror([0,0,1]) translate ([boltHolesSp,0,boltHolesSp]) bolthole(size, depth);
-    mirror([1,0,1]) translate ([boltHolesSp,0,boltHolesSp]) bolthole(size, depth);
-}
-
-module bolthole(size, depth) {
-     rotate([90,0,0]) cylinder(h = depth, r1 = size/2, r2 = size/2, $fn = 12);
-}
+module holesBox() {
+    
+    }
